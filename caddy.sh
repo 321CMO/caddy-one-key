@@ -6,70 +6,71 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-# 权限检查
+# 检查权限
 [[ $EUID -ne 0 ]] && echo -e "${RED}错误: 请以 root 权限运行${NC}" && exit 1
 
-# 状态检测
-check_status() {
-    if command -v caddy >/dev/null 2>&1; then
-        STATUS="${GREEN}已安装${NC}"
-        VERSION=$(caddy version | awk '{print $1}')
-    else
-        STATUS="${RED}未安装${NC}"
-        VERSION="N/A"
-    fi
-}
-
-# 1. 按照教程：使用官方脚本安装
+# 安装功能 - 严格执行教程步骤
 install_caddy() {
-    echo -e "${YELLOW}正在执行教程推荐的官方一键安装脚本...${NC}"
-    
-    # 步骤 A：下载并运行官方 debian 安装脚本
-    # 链接来源：https://naiyous.com/4457.html (官方脚本方式)
-    curl -sS https://raw.githubusercontent.com/caddyserver/dist-static/master/scripts/debian.sh | bash
-    
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}Caddy 安装成功！${NC}"
+    echo -e "${YELLOW}第一步：安装必要的依赖 (debian-keyring, curl 等)...${NC}"
+    apt update
+    apt install -y debian-keyring debian-archive-keyring apt-transport-https curl gnupg
+
+    echo -e "${YELLOW}第二步：下载并导入官方 GPG 密钥...${NC}"
+    # 教程核心命令 1
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.vector.txt' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg --yes
+
+    echo -e "${YELLOW}第三步：添加 Caddy 官方软件源列表...${NC}"
+    # 教程核心命令 2
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+
+    echo -e "${YELLOW}第四步：更新软件源索引...${NC}"
+    apt update
+
+    echo -e "${YELLOW}第五步：正式安装 Caddy...${NC}"
+    apt install -y caddy
+
+    if command -v caddy >/dev/null 2>&1; then
+        echo -e "${GREEN}恭喜！Caddy 已根据教程步骤成功安装。${NC}"
         # 注册快捷命令唤醒
         ln -sf "$(readlink -f "$0")" /usr/local/bin/caddy
         systemctl enable caddy
         systemctl start caddy
     else
-        echo -e "${RED}安装失败，请检查网络是否能连接 GitHub。${NC}"
+        echo -e "${RED}安装失败。请检查上方报错信息。${NC}"
     fi
     read -p "按回车继续"
 }
 
-# 2. 卸载功能
+# 卸载功能
 uninstall_caddy() {
     echo -e "${YELLOW}正在彻底卸载 Caddy...${NC}"
     systemctl stop caddy
     apt purge caddy -y
     apt autoremove -y
     rm -rf /etc/caddy
+    rm -f /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    rm -f /etc/apt/sources.list.d/caddy-stable.list
     rm -f /usr/local/bin/caddy
     echo -e "${GREEN}卸载完成。${NC}"
     exit 0
 }
 
-# 菜单界面
+# 菜单
 show_menu() {
     clear
-    check_status
     echo "---------------------------"
-    echo "  Caddy 官方脚本管理版"
-    echo "  状态: $STATUS  版本: $VERSION"
+    echo "  Caddy 教程同步版"
     echo "---------------------------"
-    echo "  1. 安装 Caddy (官方流程)"
-    echo "  2. 卸载 Caddy"
-    echo "  3. 重启 Caddy"
+    echo "  1. 执行全步骤安装"
+    echo "  2. 彻底卸载 Caddy"
+    echo "  3. 重启 Caddy 服务"
     echo "  0. 退出"
     echo "---------------------------"
     read -p "请选择 [0-3]: " opt
     case $opt in
         1) install_caddy ;;
         2) uninstall_caddy ;;
-        3) systemctl restart caddy && echo -e "${GREEN}服务已重启${NC}" && sleep 1 ;;
+        3) systemctl restart caddy && echo "已重启" ;;
         0) exit 0 ;;
         *) show_menu ;;
     esac
