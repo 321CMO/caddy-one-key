@@ -23,9 +23,6 @@ wget -O caddy.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/cad
 - **极简安装**  
   严格按照教程流程执行 GPG 密钥导入与官方源添加  
 
-- **Swap 保护**  
-  自动防止 1H1G 等小内存 VPS 在安装过程中因内存不足而崩溃  
-
 - **分类卸载**  
   - 仅卸载 Caddy 程序  
   - 或连同配置、残留文件一并彻底清除  
