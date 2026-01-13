@@ -1,36 +1,90 @@
-这两个脚本的主要区别在于功能深度。两者都严格遵循你要求的 4457.html 教程安装逻辑，但在后续管理上有分工。
+# Caddy One-Key 安装脚本说明
 
-1. 基础纯净版 (caddy.sh)
-适合人群： 只需要把 Caddy 装好，习惯自己手动去 /etc/caddy/Caddyfile 改配置的用户。
+本仓库提供 **两种 Caddy 一键脚本**，主要区别在于 **安装后的管理深度**。  
+二者均 **严格遵循官方的安装逻辑**，在后续管理方式上进行功能分工，用户可按需选择。
 
-安装命令：
+---
 
-Bash
+## 一、基础纯净版（`caddy.sh`）
 
-wget -O caddy.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy.sh?v=$(date +%s) && chmod +x caddy.sh && ./caddy.sh
-功能：
+**适合人群：**  
+- 只需要把 Caddy 正确装好  
+- 熟悉 Caddy，自行手动编辑 `/etc/caddy/Caddyfile`  
+- 追求系统尽量“干净”的用户  
 
-极简安装：严格按照教程执行 GPG 密钥导入和源添加。
+### 安装命令
 
-Swap 保护：防止 1H1G 小鸡在安装时内存溢出。
+```bash
+wget -O caddy.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy.sh?v=$(date +%s) \
+&& chmod +x caddy.sh \
+&& ./caddy.sh
+```
 
-分类卸载：支持“只删程序”或“全盘清除”。
+### 功能特点
 
-2. 稳健管理版 (caddy2.sh)
-适合人群： 希望通过菜单直接完成反代配置，不想记复杂的 Caddy 语法，且需要快速查看现有站点的用户。
+- **极简安装**  
+  严格按照教程流程执行 GPG 密钥导入与官方源添加  
 
-安装命令：
+- **Swap 保护**  
+  自动防止 1H1G 等小内存 VPS 在安装过程中因内存不足而崩溃  
 
-Bash
+- **分类卸载**  
+  - 仅卸载 Caddy 程序  
+  - 或连同配置、残留文件一并彻底清除  
 
-wget -O caddy2.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy2.sh?v=$(date +%s) && chmod +x caddy2.sh && ./caddy2.sh
-功能：
+---
 
-一键反代：输入域名和后端端口（如 8080），脚本自动写入配置并生效，无需手动改文件。
+## 二、稳健管理版（`caddy2.sh`）
 
-站点清单：一键列出当前服务器上所有已经配置好的域名，方便管理。
+**适合人群：**  
+- 不想记 Caddy 复杂语法  
+- 希望通过菜单完成反向代理配置  
+- 需要快速查看和管理已有站点的用户  
 
-语法检测：添加反代后会自动校验语法，如果写错了会自动报错，防止 Caddy 服务崩溃。
+### 安装命令
 
-💡 核心共同点
-这两个脚本安装成功后，都会在系统里注册一个 caddy 命令。下次你想操作时，不需要再找 caddy.sh 在哪，直接在任意位置输入 caddy 回车就能呼出菜单。
+```bash
+wget -O caddy2.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy2.sh?v=$(date +%s) \
+&& chmod +x caddy2.sh \
+&& ./caddy2.sh
+```
+
+### 功能特点
+
+- **一键反代**  
+  只需输入：
+  - 域名  
+  - 后端端口（如 `8080`）  
+  脚本将自动生成配置并立即生效，无需手动修改文件  
+
+- **站点清单**  
+  一键列出当前服务器中所有已配置的域名，方便统一管理  
+
+- **语法检测**  
+  新增反代后自动进行配置校验  
+  - 配置错误会直接提示  
+  - 防止错误配置导致 Caddy 服务崩溃  
+
+---
+
+## 💡 核心共同点（非常重要）
+
+无论使用 **`caddy.sh`** 还是 **`caddy2.sh`**：
+
+- 安装完成后，系统都会注册 `caddy` 命令  
+- 之后 **无需再寻找脚本文件**  
+- 在任意目录输入以下命令即可呼出管理菜单：
+
+```bash
+caddy
+```
+
+---
+
+## 如何选择？
+
+| 需求 | 推荐脚本 |
+|----|----|
+| 只安装 Caddy，自行折腾配置 | `caddy.sh` |
+| 菜单化管理 / 快速反代 | `caddy2.sh` |
+| 新手 / 懒人 / 批量站点 | `caddy2.sh` |
