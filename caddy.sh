@@ -30,7 +30,7 @@ install_caddy() {
     apt install -y caddy
 
     if command -v caddy >/dev/null 2>&1; then
-        echo -e "${GREEN}恭喜！Caddy 已根据教程步骤成功安装。${NC}"
+        echo -e "${GREEN}恭喜！Caddy 已成功安装。${NC}"
         # 注册快捷命令唤醒
         ln -sf "$(readlink -f "$0")" /usr/local/bin/caddy
         systemctl enable caddy
@@ -59,7 +59,7 @@ uninstall_caddy() {
 show_menu() {
     clear
     echo "---------------------------"
-    echo "  caddy-one-key 一键安装脚本"
+    echo " caddy-one-key 一键安装脚本"
     echo "---------------------------"
     echo "  1. 执行全步骤安装"
     echo "  2. 彻底卸载 Caddy"
