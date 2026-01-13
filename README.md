@@ -12,4 +12,4 @@
 在您的 Linux 终端（以 Root 权限）执行以下命令：
 
 ```bash
-wget -O caddy.sh [https://raw.githubusercontent.com/您的用户名/您的仓库名/main/caddy.sh](https://raw.githubusercontent.com/您的用户名/您的仓库名/main/caddy.sh) && chmod +x caddy.sh && ./caddy.sh
+wget -O caddy.sh [https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy.sh](https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy.sh) && chmod +x caddy.sh && ./caddy.sh
