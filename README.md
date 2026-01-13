@@ -15,9 +15,7 @@
 ### 安装命令
 
 ```bash
-wget -O caddy.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy.sh?v=$(date +%s) \
-&& chmod +x caddy.sh \
-&& ./caddy.sh
+wget -O caddy.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy.sh?v=$(date +%s) && chmod +x caddy.sh && ./caddy.sh
 ```
 
 ### 功能特点
@@ -44,9 +42,7 @@ wget -O caddy.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/cad
 ### 安装命令
 
 ```bash
-wget -O caddy2.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy2.sh?v=$(date +%s) \
-&& chmod +x caddy2.sh \
-&& ./caddy2.sh
+wget -O caddy2.sh https://raw.githubusercontent.com/321CMO/caddy-one-key/main/caddy2.sh?v=$(date +%s) && chmod +x caddy2.sh && ./caddy2.sh
 ```
 
 ### 功能特点
