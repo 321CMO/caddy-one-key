@@ -1,11 +1,9 @@
 #!/bin/bash
 
 # =========================================================
-# Caddy 综合管理脚本 V4.0
-# 功能：全步骤安装、反代管理、语法校验、备份恢复、分类卸载
+# Caddy 综合管理脚本 V4.1 (基于 4457.html 修复版)
 # =========================================================
 
-# 路径与变量定义
 CADDY_FILE="/etc/caddy/Caddyfile"
 SCRIPT_PATH="/usr/local/bin/caddy-mgr"
 ALIAS_COMMAND="/usr/local/bin/caddy"
@@ -33,14 +31,14 @@ check_status() {
     fi
 }
 
-# 注册/更新脚本唤醒命令
+# 注册脚本唤醒命令
 register_self() {
     cp "$0" "$SCRIPT_PATH"
     chmod +x "$SCRIPT_PATH"
     ln -sf "$SCRIPT_PATH" "$ALIAS_COMMAND"
 }
 
-# 1. 严格按照步骤安装
+# 1. 严格按照 4457.html 教程步骤安装
 install_caddy() {
     echo -e "${YELLOW}正在执行教程全步骤安装...${NC}"
     
@@ -67,14 +65,14 @@ install_caddy() {
         register_self
         systemctl enable caddy
         systemctl start caddy
-        echo -e "${GREEN}安装成功！现在输入 'caddy' 即可呼出此菜单。${NC}"
+        echo -e "${GREEN}安装成功！现在输入 'caddy' 即可呼出菜单。${NC}"
     else
-        echo -e "${RED}安装失败，请检查网络报错。${NC}"
+        echo -e "${RED}安装失败。${NC}"
     fi
     read -p "按回车继续"
 }
 
-# 2. 添加反向代理 (带语法校验与回滚)
+# 2. 添加反向代理
 add_reverse_proxy() {
     echo -e "${BLUE}--- 添加反向代理配置 ---${NC}"
     read -p "请输入域名 (如 example.com): " domain
@@ -82,9 +80,7 @@ add_reverse_proxy() {
     
     [[ -z "$domain" || -z "$target" ]] && echo -e "${RED}输入不能为空。${NC}" && return
 
-    # 临时备份用于校验
     cp "$CADDY_FILE" "${CADDY_FILE}.tmp"
-    
     cat >> "$CADDY_FILE" <<EOF
 
 $domain {
@@ -92,62 +88,4 @@ $domain {
 }
 EOF
 
-    echo -e "${YELLOW}正在校验配置语法...${NC}"
-    if caddy validate --config "$CADDY_FILE" >/dev/null 2>&1; then
-        caddy fmt --overwrite "$CADDY_FILE"
-        systemctl reload caddy
-        rm "${CADDY_FILE}.tmp"
-        echo -e "${GREEN}反代添加成功！SSL 将自动申请。${NC}"
-    else
-        mv "${CADDY_FILE}.tmp" "$CADDY_FILE"
-        echo -e "${RED}语法错误！已自动回滚配置，请检查输入格式。${NC}"
-    fi
-    read -p "按回车继续"
-}
-
-# 3. 查看站点列表
-list_sites() {
-    echo -e "${PURPLE}--- 当前已配置站点列表 ---${NC}"
-    if [ ! -f "$CADDY_FILE" ]; then
-        echo "配置文件不存在。"
-    else
-        grep -E '^[a-zA-Z0-9.-]+.*\{' "$CADDY_FILE" | sed 's/{//g' || echo "暂无站点配置"
-    fi
-    echo -e "${PURPLE}--------------------------${NC}"
-    read -p "按回车继续"
-}
-
-# 4. 备份功能
-backup_caddy() {
-    mkdir -p "$BACKUP_DIR"
-    local FILE_NAME="Caddyfile_$(date +%Y%m%d_%H%M%S).bak"
-    cp "$CADDY_FILE" "$BACKUP_DIR/$FILE_NAME"
-    echo -e "${GREEN}已备份至: $BACKUP_DIR/$FILE_NAME${NC}"
-}
-
-# 5. 卸载 Caddy 程序 (保留脚本)
-uninstall_only_caddy() {
-    read -p "确定卸载 Caddy 程序？(y/n): " res
-    if [[ $res == "y" ]]; then
-        systemctl stop caddy
-        apt purge caddy -y
-        apt autoremove -y
-        echo -e "${GREEN}Caddy 程序已卸载。脚本及快捷命令已保留。${NC}"
-    fi
-}
-
-# 6. 彻底卸载 (程序 + 脚本)
-uninstall_all() {
-    read -p "确定删除 Caddy 及其管理脚本？(y/n): " res
-    if [[ $res == "y" ]]; then
-        systemctl stop caddy
-        apt purge caddy -y
-        rm -rf /etc/caddy
-        rm -f "$ALIAS_COMMAND" "$SCRIPT_PATH"
-        echo -e "${GREEN}所有内容已清理干净。${NC}"
-        exit 0
-    fi
-}
-
-# 菜单界面
-show
+    if caddy validate --config "$CADDY_FILE"
